@@ -1,5 +1,5 @@
 const express = require('express');
-const { createTask, getUserTasks } = require('../apps/task/controllers/controllers');
+const { createTask, getUserTasks, edit } = require('../apps/task/controllers/controllers');
 //const authMiddleware = require('../apps/task/middlewares/middlewares');
 const { authenticateToken } = require('../middlewares/auth');
 
@@ -21,5 +21,13 @@ router.get('/', authenticateToken, getUserTasks);
  * @security JWT
  */
 router.post('/new', authenticateToken, createTask);
+
+/**
+ * @route PUT /tasks/update
+ * @group Tasks - Task management operations
+ * @summary Update a task
+ * @security JWT
+ */
+router.put('/edit/:id', authenticateToken, edit);
 
 module.exports = router;
