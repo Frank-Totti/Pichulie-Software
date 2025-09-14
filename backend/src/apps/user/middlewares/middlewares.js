@@ -3,6 +3,13 @@ const attempts = {}; // { ip: { count, firstAttempt } }
 const MAX_ATTEMPTS = 5;            // Max 5 tries
 const WINDOW_TIME = 10 * 60 * 1000; // 10 minutes in ms
 
+const multer = require('multer');
+const storage = multer.diskStorage({
+    filename: (req, file, cb) => {
+        cb(null, file.originalname);
+    }
+});
+
 /**
  * Login rate limiting middleware
  * 
@@ -42,4 +49,24 @@ const loginLimiter = (req, res, next) => {
     next();
 };
 
-module.exports = loginLimiter;
+// Error handling middleware for multer
+const handleMulterError = (error, req, res, next) => {
+    if (error) {
+        if (error.code === 'LIMIT_FILE_SIZE') {
+            return res.status(400).json({ 
+                message: 'File too large. Maximum size is 5MB.' 
+            });
+        }
+        if (error.message === 'Only image files are allowed!') {
+            return res.status(400).json({ 
+                message: 'Only image files are allowed!' 
+            });
+        }
+        return res.status(400).json({ 
+            message: error.message || 'File upload error' 
+        });
+    }
+    next();
+};
+
+module.exports = { loginLimiter, handleMulterError };

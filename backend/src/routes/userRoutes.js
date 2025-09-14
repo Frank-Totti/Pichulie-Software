@@ -1,6 +1,7 @@
 const express = require('express');
-const { login, requestPasswordReset, resetPassword, validateResetToken, resendResetToken, register, update } = require('../apps/user/controllers/controllers');
-const loginLimiter = require('../apps/user/middlewares/middlewares');
+const { login, requestPasswordReset, resetPassword, validateResetToken, resendResetToken, register, update, uploadProfilePicture } = require('../apps/user/controllers/controllers');
+const { upload } = require('../config/cloudinary');
+const { loginLimiter, handleMulterError } = require('../apps/user/middlewares/middlewares');
 const { authenticateToken } = require('../middlewares/auth');
 
 const router = express.Router();
@@ -24,6 +25,8 @@ router.post('/login', loginLimiter, login); // LoginTime disable
 router.post('/register', register);
 
 router.put('/update', authenticateToken, update);
+
+router.put('/upload-pfp', authenticateToken, upload.single('profilePicture'), handleMulterError, uploadProfilePicture);
 
 // Routes for password reset
 /**

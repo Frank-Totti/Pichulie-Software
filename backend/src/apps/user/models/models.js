@@ -27,6 +27,10 @@ const UserSchema = new Schema(
 	"name": { type: String, required: true},
     "age": { type: Number, required: true},
     "isBlocked": {type: Boolean, default: false},
+    "profilePicture": {
+        "profilePictureURL": {type: String, default: 'https://res.cloudinary.com/dsyxsanls/image/upload/v1757780957/Global_Profile_Picture_j3ayrk.png'},
+        "profilePictureID": {type: String, default: 'Global_Profile_Picture_j3ayrk'}
+    },
     "resetPasswordToken": { type: String },
     "resetPasswordExpires": { type: Date },
     "resetPasswordUsed": { type: Boolean, default: false }

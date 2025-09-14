@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
+const { cloudinary } = require('../../../config/cloudinary');
 require('dotenv').config();
 
 /**
@@ -208,7 +209,47 @@ const update = async (req, res) => {
   } catch (error){
     return handleServerError(error, 'Update user', res);
   }
-}
+};
+
+const uploadProfilePicture = async (req, res) => {
+  try {
+    // Check if file was uploaded
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    // File is automatically uploaded to Cloudinary via multer-storage-cloudinary
+    const result = req.file;
+
+    const user = await User.findById(req.user.id);
+
+    // Store the old profile picture ID before updating
+    const oldProfilePictureID = user.profilePicture.profilePictureID;
+
+    // Delete previous profile picture from cloudinary if not default
+    const isPfpDefault = oldProfilePictureID === 'Global_Profile_Picture_j3ayrk';
+
+    if(!isPfpDefault) {
+      try{
+        await cloudinary.uploader.destroy(oldProfilePictureID);
+      } catch (deleteError) {
+          console.warn('Failed to delete old profile picture:', deleteError);
+        }
+    }
+
+    // Update user profile picture info
+    user.profilePicture.profilePictureURL = result.path;
+    user.profilePicture.profilePictureID = result.filename;
+
+    // Save the user
+    await user.save();
+    return res.status(200).json({ message: 'Profile picture uploaded successfully' });
+
+  } catch (error) {
+    console.error('Upload error:', error);
+    return handleServerError(error, 'Upload user profile picture', res);
+  }
+};
 
 // Configure email transporter
 /**
@@ -647,4 +688,4 @@ const resendResetToken = async (req, res) => {
   }
 };
 
-module.exports = { login, requestPasswordReset, resetPassword, validateResetToken, resendResetToken, register, update };
+module.exports = { login, requestPasswordReset, resetPassword, validateResetToken, resendResetToken, register, update, uploadProfilePicture };
