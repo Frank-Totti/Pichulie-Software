@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pichulie</title>
+    <link rel="stylesheet" href="../styles/edit-profile.css">
+</head>
+<body>
+    <iframe src="../components/pages/header.html" frameborder="0"></iframe>
+
+    <div class="app">
+
+        <!-- Edit Profile View -->
+        <div id="editProfileView" class="content-view active">
+
+            <header class="page__title">
+                <a href="../pages/dashboard.html" class="back-link">
+                    <span class="back-arrow">←</span>
+                    <span>Back to Dashboard</span>
+                </a>
+                <h1>Edit Profile</h1>
+            </header>
+            
+            <div class="profile__container">
+                <div class="profile__left">
+                    <div class="avatar-preview">
+                        <img id="avatarPreview" src="/public/logo.png" alt="Profile Avatar">
+                        <div class="avatar-overlay">
+                            <span class="camera-icon">📷</span>
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="change-avatar-btn" id="changeAvatarBtn">
+                        Change Avatar
+                    </button>
+                    <input type="file" id="avatarInput" accept="image/*" style="display: none;">
+                </div>
+
+                <div class="profile__right">
+                    <form class="profile-form" id="profileForm">
+                        <div class="form-group">
+                            <label for="userName" class="form-label">Full Name</label>
+                            <input 
+                                type="text" 
+                                id="userName" 
+                                name="name" 
+                                class="form-input"
+                                required
+                                minlength="2"
+                                maxlength="100"
+                            >
+                            <div class="input-hint">Enter your full name (2-100 characters)</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="userEmail" class="form-label">Email Address</label>
+                            <input 
+                                type="email" 
+                                id="userEmail" 
+                                name="email" 
+                                class="form-input"
+                                required
+                            >
+                            <div class="input-hint">Your email address for login and notifications</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="userAge" class="form-label">Age</label>
+                            <input 
+                                type="number" 
+                                id="userAge" 
+                                name="age" 
+                                class="form-input"
+                                required
+                                min="13"
+                                max="122"
+                            >
+                            <div class="input-hint">Must be between 13 and 122 years old</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="userPassword" class="form-label">Password</label>
+                            <div class="password-input-container">
+                                <input 
+                                    type="password" 
+                                    id="userPassword" 
+                                    name="password" 
+                                    class="form-input password-input" 
+                                    placeholder="Enter new password"
+                                    minlength="8"
+                                >
+                                <button type="button" class="password-toggle" id="passwordToggle">
+                                    <span class="eye-icon">🙈</span>
+                                </button>
+                            </div>
+                            <div class="input-hint">
+                                Password must be at least 8 characters with uppercase, lowercase, and number
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="confirmPassword" class="form-label">Confirm Password</label>
+                            <div class="password-input-container">
+                                <input 
+                                    type="password" 
+                                    id="confirmPassword" 
+                                    name="confirmPassword" 
+                                    class="form-input password-input" 
+                                    placeholder="Confirm new password"
+                                    minlength="8"
+                                >
+                                <button type="button" class="password-toggle" id="confirmPasswordToggle">
+                                    <span class="eye-icon">🙈</span>
+                                </button>
+                            </div>
+                            <div class="input-hint">Re-enter your password to confirm</div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" id="cancelBtn">
+                                Cancel
+                            </button>                                
+                            <button type="submit" class="btn btn-primary" id="saveBtn">
+                                <span class="btn-text">Save Changes</span>
+                                <span class="btn-loading" style="display: none;">Saving...</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content success-modal">
+            <div class="modal-icon"></div>
+            <h3 class="modal-title">Profile Updated Successfully!</h3>
+            <p class="modal-message">Your profile has been updated with the new information.</p>
+            <button class="btn btn-primary" id="closeSuccessModal">Continue</button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <iframe src="../components/pages/footer.html" frameborder="0" style="width:100%; height:84px;"></iframe>
+
+    <script type="module" src="../scripts/edit-profile.controller.js"></script>
+</body>
+</html>

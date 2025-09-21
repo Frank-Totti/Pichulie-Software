@@ -132,11 +132,11 @@ function performLogout() {
         sessionStorage.removeItem(key);
     });
 
-    window.top.location.href = '../../login.html';
+    window.top.location.href = '../../../index.html';
 }
 
 function editProfile() {
-    window.top.location.href = '../../profile/edit-profile.html';
+    window.top.location.href = '../../pages/edit-profile.html';
 }
 
 // Call when page loads
