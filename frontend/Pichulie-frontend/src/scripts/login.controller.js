@@ -1,3 +1,4 @@
+const API_PORT = import.meta.env.VITE_BACKEND_PORT
 
 document.getElementById("login").addEventListener("click",async function (e) {
     e.preventDefault();
@@ -7,7 +8,7 @@ document.getElementById("login").addEventListener("click",async function (e) {
 
     try {
         
-        let response = await fetch("http://localhost:3000/api/users/login", {
+        let response = await fetch(`${API_PORT}/api/users/login`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json"

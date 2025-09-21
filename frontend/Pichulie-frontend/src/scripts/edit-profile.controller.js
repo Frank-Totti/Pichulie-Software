@@ -384,7 +384,7 @@ async loadUserData() {
   closeSuccessModal() {
     const modal = document.getElementById('successModal')
     if (modal) modal.style.display = 'none'
-    window.location.href = '../dashboard/dashboard.html';
+    window.location.href = '../pages/dashboard.html';
   }
 
   handleCancel() {
@@ -393,7 +393,7 @@ async loadUserData() {
       const confirmed = confirm('You have unsaved changes. Are you sure you want to cancel?')
       if (!confirmed) return
     }
-    window.location.href = '../dashboard/dashboard.html';
+    window.location.href = '../pages/dashboard.html';
   }
 
   hasUnsavedChanges() {

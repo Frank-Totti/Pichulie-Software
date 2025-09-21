@@ -1,3 +1,5 @@
+const API_PORT = import.meta.env.VITE_BACKEND_PORT
+
 document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("recover");
     const resultado = document.getElementById("resultado");
@@ -8,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const email = document.getElementById("email").value;
   
       try {
-        const response = await fetch("http://localhost:3000/api/users/request-reset", {
+        const response = await fetch(`${API_PORT}/api/users/request-reset`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json"

@@ -1,3 +1,5 @@
+const API_PORT = import.meta.env.VITE_BACKEND_PORT
+
 // Extraer token de la URL (?token=...)
 const urlParams = new URLSearchParams(window.location.search);
 const token = urlParams.get("token");
@@ -18,7 +20,7 @@ form.addEventListener("click", async (e) => {
   }
 
   try {
-    const res = await fetch("http://localhost:3000/api/users/reset-password", {
+    const res = await fetch(`${API_PORT}/api/users/reset-password`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token, newPassword })

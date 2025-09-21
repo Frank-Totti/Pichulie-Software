@@ -1,3 +1,5 @@
+const API_PORT = import.meta.env.VITE_BACKEND_PORT
+
 document.getElementById("register").addEventListener("click", async function (e) {
     e.preventDefault();
 
@@ -11,7 +13,7 @@ document.getElementById("register").addEventListener("click", async function (e)
 
     try {
         // Llamada al endpoint de registro
-        const response = await fetch("http://localhost:3000/api/users/register", {
+        const response = await fetch(`${API_PORT}/api/users/register`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
