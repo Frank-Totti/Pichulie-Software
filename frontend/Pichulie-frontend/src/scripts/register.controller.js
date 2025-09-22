@@ -9,7 +9,6 @@ document.getElementById("register").addEventListener("click", async function (e)
     const passwordCheck = document.getElementById("passwordCheck").value;
     const name = document.getElementById("name").value;
     const age = document.getElementById("age").value;
-    //const last_name = document.getElementById("last-name").value;
 
     try {
         // Llamada al endpoint de registro
@@ -39,6 +38,8 @@ document.getElementById("register").addEventListener("click", async function (e)
         const data = await response.json();
 
         alert("Registro exitoso, ahora puedes iniciar sesión");
+
+        window.top.location.href = 'login.html'
 
     } catch (error) {
         alert(error.message);

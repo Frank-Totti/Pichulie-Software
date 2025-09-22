@@ -1,5 +1,19 @@
 const API_PORT = import.meta.env.VITE_BACKEND_PORT
 
+function decodeToken(token) {
+    try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        return JSON.parse(jsonPayload);
+    } catch (error) {
+        console.error("Error decoding token:", error);
+        return null;
+    }
+}
+
 class TaskManager {
   constructor() {
     this.tasks = {
@@ -266,9 +280,6 @@ class TaskManager {
       alert("An error occurred while saving the task. Check the console for details.");
     }
   }
-  
-  
-
 
   formatTime(time24) {
     if (!time24) return ""
@@ -278,15 +289,29 @@ class TaskManager {
     return `${hour12}:${minutes} ${ampm}`
   }
 
-  /*{
-  "user_id": "68c0b77311637b188b40eb6b",
-  "task_date" : "2025-09-14"
-  
-}*/
   async renderTasks(fecha) {
     try {
         const token = localStorage.getItem("token");
-        if (!token) throw new Error("No auth token found. Please login.");
+        
+        if (!token) {
+            throw new Error("Authentication required - No token found");
+        }
+
+        // Decode token to get userId
+        const decodedToken = decodeToken(token);
+        if (!decodedToken || !decodedToken.id) {
+            throw new Error("Invalid token format");
+        }
+
+        const userId = decodedToken.id; // Get userId from token
+
+        if (!token) {
+            console.warn("Missing auth data:", {
+                token: !!token,
+                userId: !!userId
+            });
+            throw new Error("Authentication required - Token: " + !!token + ", UserId: " + !!userId);
+        }
 
         const response = await fetch(`${API_PORT}/api/task/by-date`, {
             method: "POST",
@@ -294,45 +319,96 @@ class TaskManager {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${token}`
             },
-            body:JSON.stringify({
-              user_id :localStorage.getItem("id"),
-              task_date : fecha
+            body: JSON.stringify({
+                user_id: userId,
+                task_date: fecha
             })
-
         });
+
+        // Log raw response for debugging
+        const rawText = await response.text();
 
         if (!response.ok) {
-            throw new Error(`Error fetching tasks: ${response.status}`);
+            throw new Error(`Server error: ${response.status} - ${rawText}`);
         }
 
-        const data = await response.json();
-        const tasksArray = data.tasks;
+        // Parse the response text
+        const data = JSON.parse(rawText);
 
-        // Agrupar y renderizar tareas como antes
-        const tasksByColumn = { todo: [], inprocess: [], finished: [] };
-        tasksArray.forEach(task => {
-            const column = this.statusToColumn[task.status];
-            if (column) {
-              tasksByColumn[column].push(task);
-            }
-        });
+        // Clear current tasks
+        this.tasks = {
+            todo: [],
+            inprocess: [],
+            finished: []
+        };
 
-        // Mantener this.tasks sincronizado con backend
-        this.tasks = tasksByColumn;
-
-        Object.keys(tasksByColumn).forEach(column => {
-            const taskList = document.querySelector(`[data-column="${column}"]`);
-            if (!taskList) return;
-            taskList.innerHTML = "";
-            tasksByColumn[column].forEach(task => {
-                const taskCard = this.createTaskCard(task, column);
-                taskList.appendChild(taskCard);
+        // Map tasks from DB to columns
+        if (data.tasks && Array.isArray(data.tasks)) {
+            data.tasks.forEach(task => {
+                // Verify task belongs to current user
+                if (task.user_id === userId) {
+                    const column = this.statusToColumn[task.status?.toLowerCase()];
+                    if (column) {
+                        this.tasks[column].push({
+                            _id: task._id,
+                            title: task.title,
+                            description: task.detail,
+                            time: new Date(task.task_date).toLocaleTimeString([], {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: true
+                            }),
+                            reminder: task.remember,
+                            status: task.status,
+                            user_id: task.user_id
+                        });
+                    }
+                }
             });
+        }
+
+        // Render tasks in columns
+        Object.keys(this.tasks).forEach(column => {
+            const columnEl = document.querySelector(`.task-column[data-column="${column}"]`);
+            if (!columnEl) {
+                console.warn(`Column element not found: ${column}`);
+                return;
+            }
+
+            // Clear existing tasks
+            columnEl.innerHTML = '';
+
+            // Add column title
+            const titleEl = document.createElement('h2');
+            titleEl.className = 'column-title';
+            titleEl.textContent = column === 'inprocess' ? 'In Progress' : 
+                                column === 'todo' ? 'To Do' : 'Finished';
+            columnEl.appendChild(titleEl);
+
+            // Create task list container
+            const taskList = document.createElement('div');
+            taskList.className = 'task-list';
+
+            // Add tasks
+            if (this.tasks[column].length === 0) {
+                // Show empty state
+                const emptyState = document.createElement('div');
+                emptyState.className = 'empty-state';
+                emptyState.textContent = 'No tasks yet';
+                taskList.appendChild(emptyState);
+            } else {
+                this.tasks[column].forEach(task => {
+                    const taskCard = this.createTaskCard(task, column);
+                    taskList.appendChild(taskCard);
+                });
+            }
+
+            columnEl.appendChild(taskList);
         });
 
     } catch (error) {
-        console.error("Error rendering tasks:", error);
-        alert(error.message);
+        console.error("Error fetching tasks:", error);
+        alert(`Error loading tasks: ${error.message}`);
     }
 }
 
